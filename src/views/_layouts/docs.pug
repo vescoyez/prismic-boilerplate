@@ -1,0 +1,23 @@
+include ../_includes/mixins.pug
+
+doctype html
+html.h-full(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="x-ua-compatible" content="ie=edge")
+    title Documentation
+    meta(name="description" content="")
+    meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+    link(rel="stylesheet" href="/css/docs.min.css")
+    link(rel="icon" href="/favicon.svg")
+  body.h-full
+    .min-h-full.flex
+      .w-40.border-r.p-4
+        ul
+          li Link 1
+          li Link 2
+
+      .flex-grow
+        block content
+    
+    script(src="/js/app.js")

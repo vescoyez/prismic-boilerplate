@@ -1,0 +1,12 @@
+mixin icon(name)
+  span&attributes(attributes)
+    != icon(name)
+
+mixin button(content)
+  - const tag = attributes.href ? 'a' : 'button'
+  #{tag}.bg-red-500.px-4.py-2.text-white.rounded-lg&attributes(attributes)
+    block
+
+mixin card
+  .rounded.shadow
+    block

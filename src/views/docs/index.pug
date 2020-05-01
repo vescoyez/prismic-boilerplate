@@ -1,0 +1,11 @@
+extends /_layouts/docs.pug
+
+block content
+  .container.mx-auto.px-4
+    h1 Documentation
+    button.bg-red-500.px-4.py-2.text-white.rounded-lg(type="button") This is a button
+    +button(href="#") Hello
+    +card
+      span test
+    +icon('activity')
+    h2= var1
