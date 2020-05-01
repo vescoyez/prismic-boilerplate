@@ -4,8 +4,9 @@ import cache from 'gulp-cache'
 import chalk from 'chalk'
 import changed from 'gulp-changed'
 import data from 'gulp-data'
-import flatmap from 'gulp-flatmap'
 import fs from 'fs'
+import glob from 'glob'
+import mergeStream from 'merge-stream'
 import path from 'path'
 import plumber from 'gulp-plumber'
 import PrismicDOM from 'prismic-dom'
@@ -15,25 +16,25 @@ import { getPrismic, linkResolver } from './_prismic'
 
 const app = []
 
-const getContent = () => getPrismic((results) => app.push(...results))
+const content = () => getPrismic((results) => app.push(...results))
 
-const pipeline = (stream, dirname, getData) => {
-  return stream
+const pipeline = (src, getDirname, getData) => {
+  return gulp.src(src)
     .pipe(plumber({ errorHandler: bounce }))
     .pipe(changed('./dist'))
     .pipe(rename((filePath) => {
-      filePath.dirname = filePath.basename === 'index' ? filePath.dirname : dirname(filePath)
+      filePath.dirname = filePath.basename === 'index' ? filePath.dirname : getDirname(filePath)
       filePath.basename = 'index'
     }))
     .pipe(cache(data((file) => ({
       app: app,
-      asHtml: (text) => PrismicDOM.RichText.asHtml(text, linkResolver),
       ...getData(file)
     }))))
     .pipe(pug({
       basedir: './src/views',
       locals: {
-        icon: name => fs.readFileSync(`./src/icons/${name}.svg`)
+        icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
+        asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver)
       }
     }))
     .on('error', (error) => {
@@ -44,7 +45,7 @@ const pipeline = (stream, dirname, getData) => {
 
 const pages = () => {
   return pipeline(
-    gulp.src(['./src/views/**/*.pug', '!./src/views/_**/*']),
+    ['./src/views/**/*.pug', '!./**/_**/*', '!./**/_*'],
     (filePath) => path.join(filePath.dirname, filePath.basename),
     (file) => {
       const folder = path.dirname(file.path).split(path.sep).pop()
@@ -56,26 +57,25 @@ const pages = () => {
 }
 
 const templates = () => {
-  return gulp.src('./src/views/_templates/*.pug')
-    .pipe(flatmap((stream, file) => {
-      const type = path.parse(file.path).name
+  return glob('./src/views/_templates/*.pug', (er, files) => {
+    const streams = []
+    for ( const file of files ) {
+      const type = path.parse(file).name
       const pages = app.filter(page => page.type === type)
 
       for (const page of pages) {
-        pipeline(
-          stream,
+        const stream = pipeline(
+          file,
           () => path.join(type, page.uid),
           () => ({ page: page.data })
         )
+        streams.push(stream)
       }
-      return stream
-    }))
+    }
+    return mergeStream(streams)
+  })
 }
 
-const views = gulp.series(
-  getContent,
-  gulp.parallel(pages, templates),
-)
+const views = gulp.parallel(pages, templates)
 
-
-export default views
+export { content, views }

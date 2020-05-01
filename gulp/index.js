@@ -5,7 +5,7 @@ import images from './_images'
 import publicFiles from './_public'
 import server from './_server'
 import styles from './_styles'
-import views from './_views'
+import { content, views } from './_views'
 import webpack from './_webpack'
 
 const watch = () => {
@@ -17,7 +17,7 @@ const watch = () => {
 }
 
 const build = gulp.series(
-  gulp.parallel(clean, clearCache),
+  gulp.parallel(clean, clearCache, content),
   gulp.parallel(images, publicFiles, styles, views, webpack)
 )
 

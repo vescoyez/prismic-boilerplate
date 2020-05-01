@@ -11,16 +11,16 @@ const getPrismic = (callback) => {
   return Prismic.getApi(process.env.PRISMIC_API, {accessToken: process.env.PRISMIC_API_KEY}).then((api) => {
     return api.query('')
   }).then((response) => {
-    getPageLinks()
-    getTemplateLinks(response.results)
+    storePageLinks()
+    storeTemplateLinks(response.results)
     return callback(response.results)
   }, (error) => {
     console.error("Something went wrong: ", error)
   })
 }
 
-const getPageLinks = () => {
-  glob('./src/views/**/*.pug', { ignore: './src/views/_**/*' }, (er, files) => {
+const storePageLinks = () => {
+  glob('./src/views/**/*.pug', { ignore: ['./**/_**/*', './**/_*'] }, (er, files) => {
     for ( const file of files ) {
       const filePath = path.parse(file.split('views').pop())
       const dir = filePath.name === 'index' ? filePath.dir : path.join(filePath.dir, filePath.name)
@@ -31,7 +31,7 @@ const getPageLinks = () => {
   })
 }
 
-const getTemplateLinks = (app) => {
+const storeTemplateLinks = (app) => {
   glob('./src/views/_templates/*.pug', (er, files) => {
     for ( const file of files ) {
       const type = path.parse(file).name
