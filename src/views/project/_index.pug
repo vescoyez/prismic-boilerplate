@@ -1,0 +1,16 @@
+extends /_layouts/app.pug
+
+block content
+  .container.mx-auto.px-4
+    h1= page.title
+    ul
+      each project in items
+        li
+          a(href=project.url)= project.title
+    ul
+      if pagination.previous
+        li
+          a(href=pagination.previous) Previous
+      if pagination.next
+        li
+          a(href=pagination.next) Next

@@ -9,10 +9,11 @@ const links = {}
 
 const getPrismic = (callback) => {
   return Prismic.getApi(process.env.PRISMIC_API, {accessToken: process.env.PRISMIC_API_KEY}).then((api) => {
-    return api.query('')
+    return api.query('', { orderings : '[document.first_publication_date desc]', pageSize : 100 })
   }).then((response) => {
     storePageLinks()
-    storeTemplateLinks(response.results)
+    storeIndexLinks()
+    storeShowLinks(response.results)
     return callback(response.results)
   }, (error) => {
     console.error("Something went wrong: ", error)
@@ -20,28 +21,38 @@ const getPrismic = (callback) => {
 }
 
 const storePageLinks = () => {
-  glob('./src/views/**/*.pug', { ignore: ['./**/_**/*', './**/_*'] }, (er, files) => {
-    for ( const file of files ) {
-      const filePath = path.parse(file.split('views').pop())
-      const dir = filePath.name === 'index' ? filePath.dir : path.join(filePath.dir, filePath.name)
-      const uid = dir.split(path.sep).pop() || 'home'
-  
-      links[uid] = dir
-    }
-  })
+  const files = glob.sync('./src/views/**/*.pug', { ignore: ['./**/_**/*', './**/_*'] })
+  for ( const file of files ) {
+    const filePath = path.parse(file.split('views').pop())
+    const dir = filePath.name === 'index' ? filePath.dir : path.join(filePath.dir, filePath.name)
+    const uid = dir.split(path.sep).pop() || 'home'
+
+    links[uid] = dir
+  }
 }
 
-const storeTemplateLinks = (app) => {
-  glob('./src/views/_templates/*.pug', (er, files) => {
-    for ( const file of files ) {
-      const type = path.parse(file).name
-      const pages = app.filter(page => page.type === type)
+const storeIndexLinks = () => {
+  const files = glob.sync('./src/views/**/_index.pug')
+  for ( const file of files ) {
+    const filePath = path.parse(file.split('views').pop())
+    const dir = filePath.dir
+    const uid = dir.split(path.sep).pop() + 's'
 
-      for (const page of pages) {
-        links[page.uid] = path.join(path.sep, type, page.uid)
-      }
+    links[uid] = dir
+  }
+}
+
+const storeShowLinks = (app) => {
+  const files = glob.sync('./src/views/**/_show.pug')
+  for ( const file of files ) {
+    const filePath = path.parse(file.split('views').pop())
+    const type = filePath.dir.split(path.sep).pop()
+    const pages = app.filter(page => page.type === type)
+
+    for (const page of pages) {
+      links[page.uid] = path.join(filePath.dir, page.uid)
     }
-  })
+  }
 }
 	
 const linkResolver = (page) => {

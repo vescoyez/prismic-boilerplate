@@ -4,5 +4,8 @@ block content
   .container.mx-auto.px-4
     h1= page.title
     != asHtml(page.text)
-    each project in app.filter(page => page.type === 'project')
-      h2= project.data.title
+    ul
+      each project in app.filter(page => page.type === 'project').slice(0, 3)
+        li
+          a(href=url(project.uid))= project.data.title
+    +button(href=url('projects')) All projects

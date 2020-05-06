@@ -18,6 +18,14 @@ const app = []
 
 const content = () => getPrismic((results) => app.push(...results))
 
+const pageData = (page) => ({
+  uid: page.uid,
+  url: linkResolver({uid: page.uid}),
+  createdAt: page.first_publication_date,
+  updatedAt: page.last_publication_date,
+  ...page.data
+})
+
 const pipeline = (src, getDirname, getData) => {
   return gulp.src(src)
     .pipe(plumber({ errorHandler: bounce }))
@@ -34,7 +42,8 @@ const pipeline = (src, getDirname, getData) => {
       basedir: './src/views',
       locals: {
         icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
-        asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver)
+        asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
+        url: uid => linkResolver({uid: uid})
       }
     }))
     .on('error', (error) => {
@@ -49,25 +58,58 @@ const pages = () => {
     (filePath) => path.join(filePath.dirname, filePath.basename),
     (file) => {
       const folder = path.dirname(file.path).split(path.sep).pop()
-      const uid = folder === 'views' ? 'home' : folder
-      const page = app.find(page => page.uid === uid)
-      return { page: page ? page.data : {} }
+      const type = folder === 'views' ? 'home' : folder
+      const page = app.find(page => page.type === type)
+      return { page: page ? pageData(page) : {} }
     }
   )
 }
 
-const templates = () => {
-  return glob('./src/views/_templates/*.pug', (er, files) => {
+const indexPages = () => {
+  return glob('./src/views/**/_index.pug', (er, files) => {
     const streams = []
     for ( const file of files ) {
-      const type = path.parse(file).name
+      const dir = path.dirname(file).split('views').pop()
+      const itemType = dir.split(path.sep).pop()
+      const type = itemType + 's'
+      const page = app.find(page => page.type === type)
+      const items = app.filter(page => page.type === itemType).map(page => pageData(page))
+      const itemPerPage = 6
+      const pageNumber = Math.ceil(items.length / itemPerPage)
+
+      Array.from(Array(pageNumber), (_, i) => {
+        const stream = pipeline(
+          file,
+          () => i === 0 ? dir : path.join(dir, (i + 1).toString()),
+          () => ({
+            page: page ? pageData(page) : {},
+            items: items.slice(i, i + itemPerPage),
+            pagination: {
+              next: (i + 2) <= pageNumber ? path.join(dir, (i + 2).toString()) : null,
+              previous: i == 1 ? dir : i > 1 ? path.join(dir, i.toString()) : null
+            }
+          })
+        )
+        streams.push(stream)
+      })
+    }
+    return mergeStream(streams)
+  })
+}
+
+const showPages = () => {
+  return glob('./src/views/**/_show.pug', (er, files) => {
+    const streams = []
+    for ( const file of files ) {
+      const dir = path.dirname(file).split('views').pop()
+      const type = dir.split(path.sep).pop()
       const pages = app.filter(page => page.type === type)
 
       for (const page of pages) {
         const stream = pipeline(
           file,
-          () => path.join(type, page.uid),
-          () => ({ page: page.data })
+          () => path.join(dir, page.uid),
+          () => ({ page: pageData(page) })
         )
         streams.push(stream)
       }
@@ -76,6 +118,6 @@ const templates = () => {
   })
 }
 
-const views = gulp.parallel(pages, templates)
+const views = gulp.parallel(pages, indexPages, showPages)
 
 export { content, views }

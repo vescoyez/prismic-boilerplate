@@ -11,8 +11,8 @@ import tailwindcss from 'tailwindcss'
 
 const styles = () => {
   return gulp.src([
-      './src/scss/*.scss',
-      '!./src/scss/_*.scss'
+      './src/scss/**/*.scss',
+      '!./**/_*.scss'
     ])
     .pipe(plumber({ errorHandler: bounce }))
     .pipe(sourcemaps.init())
