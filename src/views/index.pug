@@ -7,5 +7,5 @@ block content
     ul
       each project in app.filter(page => page.type === 'project').slice(0, 3)
         li
-          a(href=url(project.uid))= project.data.title
+          a(href=project.url)= project.title
     +button(href=url('projects')) All projects

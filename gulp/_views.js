@@ -16,15 +16,14 @@ import { getPrismic, linkResolver } from './_prismic'
 
 const app = []
 
-const content = () => getPrismic((results) => app.push(...results))
-
-const pageData = (page) => ({
+const content = () => getPrismic((results) => app.push(...results.map(page => ({
   uid: page.uid,
-  url: linkResolver({uid: page.uid}),
+  type: page.type,
   createdAt: page.first_publication_date,
   updatedAt: page.last_publication_date,
+  url: linkResolver({uid: page.uid}),
   ...page.data
-})
+}))))
 
 const pipeline = (src, getDirname, getData) => {
   return gulp.src(src)
@@ -60,7 +59,7 @@ const pages = () => {
       const folder = path.dirname(file.path).split(path.sep).pop()
       const type = folder === 'views' ? 'home' : folder
       const page = app.find(page => page.type === type)
-      return { page: page ? pageData(page) : {} }
+      return { page: page || {} }
     }
   )
 }
@@ -73,7 +72,7 @@ const indexPages = () => {
       const itemType = dir.split(path.sep).pop()
       const type = itemType + 's'
       const page = app.find(page => page.type === type)
-      const items = app.filter(page => page.type === itemType).map(page => pageData(page))
+      const items = app.filter(page => page.type === itemType)
       const itemPerPage = 6
       const pageNumber = Math.ceil(items.length / itemPerPage)
 
@@ -82,7 +81,7 @@ const indexPages = () => {
           file,
           () => i === 0 ? dir : path.join(dir, (i + 1).toString()),
           () => ({
-            page: page ? pageData(page) : {},
+            page: page || {},
             items: items.slice(i, i + itemPerPage),
             pagination: {
               next: (i + 2) <= pageNumber ? path.join(dir, (i + 2).toString()) : null,
@@ -109,7 +108,7 @@ const showPages = () => {
         const stream = pipeline(
           file,
           () => path.join(dir, page.uid),
-          () => ({ page: pageData(page) })
+          () => ({ page: page })
         )
         streams.push(stream)
       }
