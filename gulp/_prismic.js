@@ -7,14 +7,25 @@ dotenv.config()
 
 const links = {}
 
-const getPrismic = (callback) => {
+const getDocuments = (pageNumber = 1) => {
   return Prismic.getApi(process.env.PRISMIC_API, {accessToken: process.env.PRISMIC_API_KEY}).then((api) => {
-    return api.query('', { orderings : '[document.first_publication_date desc]', pageSize : 100 })
-  }).then((response) => {
+    return api.query('', { orderings : '[document.first_publication_date desc]', pageSize : 100, page: pageNumber })
+  })
+}
+
+const getContent = (callback) => {
+  return getDocuments().then((response) => {
+    const results = response.results
+    return Promise.all(Array.from(Array(response.total_pages - 1), (_, i) => getDocuments(i + 2))).then((responses) => {
+      return results.concat(...responses.map(response => response.results))
+    }, (error) => {
+      console.error("Something went wrong: ", error)
+    })
+  }).then((results) => {
     storePageLinks()
     storeIndexLinks()
-    storeShowLinks(response.results)
-    return callback(response.results)
+    storeShowLinks(results)
+    return callback(results)
   }, (error) => {
     console.error("Something went wrong: ", error)
   })
@@ -63,4 +74,4 @@ const linkResolver = (page) => {
   return '/'
 }
 
-export { getPrismic, linkResolver }
+export { getContent, linkResolver }

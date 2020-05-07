@@ -1,6 +1,5 @@
 import gulp from 'gulp'
 import bounce from './_bounce'
-import cache from 'gulp-cache'
 import chalk from 'chalk'
 import changed from 'gulp-changed'
 import data from 'gulp-data'
@@ -12,15 +11,16 @@ import plumber from 'gulp-plumber'
 import PrismicDOM from 'prismic-dom'
 import pug from 'gulp-pug'
 import rename from 'gulp-rename'
-import { getPrismic, linkResolver } from './_prismic'
+import { getContent, linkResolver } from './_prismic'
 
 const app = []
 
-const content = () => getPrismic((results) => app.push(...results.map(page => ({
+const content = () => getContent((results) => app.push(...results.map(page => ({
   uid: page.uid,
   type: page.type,
   createdAt: page.first_publication_date,
   updatedAt: page.last_publication_date,
+  tags: page.tags,
   url: linkResolver({uid: page.uid}),
   ...page.data
 }))))
@@ -33,13 +33,11 @@ const pipeline = (src, getDirname, getData) => {
       filePath.dirname = filePath.basename === 'index' ? filePath.dirname : getDirname(filePath)
       filePath.basename = 'index'
     }))
-    .pipe(cache(data((file) => ({
-      app: app,
-      ...getData(file)
-    }))))
+    .pipe(data((file) => getData(file)))
     .pipe(pug({
       basedir: './src/views',
       locals: {
+        app: app,
         icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
         asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
         url: uid => linkResolver({uid: uid})
@@ -82,7 +80,7 @@ const indexPages = () => {
           () => i === 0 ? dir : path.join(dir, (i + 1).toString()),
           () => ({
             page: page || {},
-            items: items.slice(i, i + itemPerPage),
+            items: items.slice(i * itemPerPage, i * itemPerPage + itemPerPage),
             pagination: {
               next: (i + 2) <= pageNumber ? path.join(dir, (i + 2).toString()) : null,
               previous: i == 1 ? dir : i > 1 ? path.join(dir, i.toString()) : null
