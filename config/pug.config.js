@@ -1,8 +1,21 @@
+import { img } from './app.config'
 import fs from 'fs'
 import path from 'path'
 import { linkResolver } from '../gulp/_prismic'
 import PrismicDOM from 'prismic-dom'
 import { theme } from './tailwind.config'
+
+const resize = (image, width) => {
+  if ( image.url ) {
+    const url = new URL(image.url)
+    url.searchParams.set('w', image.dimensions.width < width ? image.dimensions.width : width)
+    url.searchParams.delete('h')
+    return url.href
+  } else {
+    const imagePath = path.parse(image)
+    return path.join('/images', imagePath.dir, '_size', width.toString(), imagePath.base)
+  }
+}
 
 module.exports = {
   basedir: './src/views',
@@ -11,17 +24,7 @@ module.exports = {
     icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
     asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
     url: uid => linkResolver({uid: uid}),
-    resize: (image, width) => {
-      if ( image.url ) {
-        const url = new URL(image.url)
-        url.searchParams.set('w', image.dimensions.width < width ? image.dimensions.width : width)
-        url.searchParams.delete('h')
-        return url.href
-      } else {
-        const imagePath = path.parse(image)
-        return path.join('/images', imagePath.dir, '_size', width.toString(), imagePath.base)
-      }
-    },
+    srcset: (image) => img.srcset.map(size => `${resize(image, size)} ${size}w`).join(','),
     getSizes: (sizes) => {
       const screenSizes = theme.screens
       const result = sizes.default ? [sizes.default] : []
@@ -32,6 +35,7 @@ module.exports = {
         result.push(`(min-width: ${screenSize}) ${size}`)
       }
       return result.reverse().join(',')
-    }
+    },
+    imgLoading: img.loading
   }
 }

@@ -1,4 +1,4 @@
-import { dest } from '../config/app.config'
+import { dest, img } from '../config/app.config'
 import gulp from 'gulp'
 import cache from 'gulp-cache'
 import changed from 'gulp-changed'
@@ -11,41 +11,14 @@ const images = () => {
     .pipe(cache(imagemin()))
     .pipe(gulp.dest(`${dest}/images`))
     .pipe(responsive({
-      '**/*': [
-        {
-          width: 200,
-          rename: {
-            prefix: '_size/200/'
-          }
-        },
-        {
-          width: 500,
-          rename: {
-            prefix: '_size/500/'
-          }
-        },
-        {
-          width: 800,
-          rename: {
-            prefix: '_size/800/'
-          }
-        },
-        {
-          width: 1200,
-          rename: {
-            prefix: '_size/1200/'
-          }
-        },
-        {
-          width: 1600,
-          rename: {
-            prefix: '_size/1600/'
-          }
-        },
-      ]
+      '**/*': img.srcset.map(size => ({
+        width: size,
+        rename: {
+          prefix: `_size/${size}/`
+        }
+      }))
     }, {
-      errorOnEnlargement: false,
-      errorOnUnusedConfig: false
+      errorOnEnlargement: false
     }))
     .pipe(gulp.dest(`${dest}/images`))
 }

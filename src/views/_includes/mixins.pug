@@ -15,13 +15,7 @@ mixin responsive-img(image, sizes = {})
   img&attributes(attributes)(
     alt=image.alt || ''
     src=image.url || `/images/${image}`
-    srcset=`
-      ${resize(image, 200)} 200w,
-      ${resize(image, 500)} 500w,
-      ${resize(image, 800)} 800w,
-      ${resize(image, 1200)} 1200w,
-      ${resize(image, 1600)} 1600w
-    `
+    srcset=srcset(image)
     sizes=`${getSizes(sizes)}`
-    loading="lazy"
+    loading=imgLoading
   )
