@@ -1,6 +1,8 @@
+import { dest } from '../config/app.config'
 import gulp from 'gulp'
 import autoprefixer from 'autoprefixer'
 import bounce from './_bounce'
+import cache from 'gulp-cache'
 import cssnano from 'cssnano'
 import plumber from 'gulp-plumber'
 import postcss from 'gulp-postcss'
@@ -19,15 +21,15 @@ const styles = () => {
     .pipe(sass({
       outputStyle: 'expanded'
     }).on('error', sass.logError))
-    .pipe(postcss([
-      tailwindcss(),
+    .pipe(cache(postcss([
+      tailwindcss('./config/tailwind.config.js'),
       autoprefixer({cascade: false})
-    ]))
-    .pipe(gulp.dest('./dist/css'))
+    ])))
+    .pipe(gulp.dest(`${dest}/css`))
     .pipe(rename({ suffix: '.min' }))
     .pipe(postcss([cssnano()]))
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest('./dist/css'))
+    .pipe(gulp.dest(`${dest}/css`))
 }
 
 export default styles

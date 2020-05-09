@@ -2,11 +2,11 @@
 # ----------------------------
 .env
 
-# Dist Folder
+# Distribution Folder
 # ----------------------------
 /dist
 
-# Node modules
+# Node
 # ----------------------------
 /node_modules
 

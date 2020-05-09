@@ -1,3 +1,4 @@
+import { dest } from '../config/app.config'
 import gulp from 'gulp'
 import bounce from './_bounce'
 import plumber from 'gulp-plumber'
@@ -26,7 +27,7 @@ const scripts = () => {
   return gulp.src('./src/js/*.js')
     .pipe(plumber({ errorHandler: bounce }))
     .pipe(webpackStream(config), webpack)
-    .pipe(gulp.dest('./dist/js'))
+    .pipe(gulp.dest(`${dest}/js`))
 }
 
 export default scripts

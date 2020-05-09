@@ -11,7 +11,7 @@ import webpack from './_webpack'
 const watch = () => {
   gulp.watch('./src/images/**/*', images)
   gulp.watch('./src/public/**/*', publicFiles)
-  gulp.watch(['./tailwind.config.js', './src/scss/**/*.scss'], styles)
+  gulp.watch(['./config/tailwind.config.js', './src/scss/**/*.scss'], styles)
   gulp.watch(['./src/views/**/*', './src/icons/**/*'], views)
   gulp.watch('./src/js/**/*.js', webpack)
 }

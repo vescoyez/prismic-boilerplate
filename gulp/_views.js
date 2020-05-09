@@ -1,21 +1,21 @@
+import { dest } from '../config/app.config'
 import gulp from 'gulp'
 import bounce from './_bounce'
 import chalk from 'chalk'
 import changed from 'gulp-changed'
 import data from 'gulp-data'
-import fs from 'fs'
 import glob from 'glob'
 import mergeStream from 'merge-stream'
 import path from 'path'
 import plumber from 'gulp-plumber'
-import PrismicDOM from 'prismic-dom'
+import { getContent, linkResolver } from './_prismic'
+import pugConfig from '../config/pug.config'
 import pug from 'gulp-pug'
 import rename from 'gulp-rename'
-import { getContent, linkResolver } from './_prismic'
 
 const app = []
 
-const content = () => getContent((results) => app.push(...results.map(page => ({
+const content = () => getContent((pages) => app.push(...pages.map(page => ({
   uid: page.uid,
   type: page.type,
   createdAt: page.first_publication_date,
@@ -25,28 +25,23 @@ const content = () => getContent((results) => app.push(...results.map(page => ({
   ...page.data
 }))))
 
-const pipeline = (src, getDirname, getData) => {
+const pipeline = (src, pageDirname, pageData) => {
   return gulp.src(src)
     .pipe(plumber({ errorHandler: bounce }))
-    .pipe(changed('./dist'))
+    .pipe(changed(dest))
     .pipe(rename((filePath) => {
-      filePath.dirname = filePath.basename === 'index' ? filePath.dirname : getDirname(filePath)
+      filePath.dirname = filePath.basename === 'index' ? filePath.dirname : pageDirname(filePath)
       filePath.basename = 'index'
     }))
-    .pipe(data((file) => getData(file)))
-    .pipe(pug({
-      basedir: './src/views',
-      locals: {
-        app: app,
-        icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
-        asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
-        url: uid => linkResolver({uid: uid})
-      }
-    }))
+    .pipe(data((file) => ({
+      app: app,
+      ...pageData(file)
+    })))
+    .pipe(pug(pugConfig))
     .on('error', (error) => {
       console.error(chalk.red(error.message))
     })
-    .pipe(gulp.dest('./dist'))
+    .pipe(gulp.dest(dest))
 }
 
 const pages = () => {
