@@ -10,4 +10,5 @@ block content
       each project in app.filter(page => page.type === 'project').slice(0, 3)
         li
           a(href=project.url)= project.title
-    +button(href=url('projects')) All projects
+    - projectsPage = getPage('projects')
+    +button(href=url(projectsPage))= projectsPage.title

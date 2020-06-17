@@ -14,5 +14,8 @@ module.exports = {
       slug: 'fr',
       label: 'Français'
     }
-  ]
+  ],
+  pagination: {
+    itemPerPage: 24
+  }
 }

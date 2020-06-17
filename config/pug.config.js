@@ -23,7 +23,7 @@ module.exports = {
     iconList: fs.readdirSync('./src/icons').map(dir => path.parse(dir).name),
     icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
     asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
-    url: uid => linkResolver({uid: uid}),
+    url: page => linkResolver(page),
     srcset: (image) => img.srcset.map(size => `${resize(image, size)} ${size}w`).join(','),
     getSizes: (sizes) => {
       const screenSizes = theme.screens

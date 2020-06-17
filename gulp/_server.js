@@ -4,7 +4,7 @@ import Browser from 'browser-sync'
 
 const browser = Browser.create()
 const config = {
-  server: './dist',
+  server: dest,
   open: false,
   port: 3000
 }

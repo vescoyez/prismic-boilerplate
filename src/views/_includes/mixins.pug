@@ -16,6 +16,6 @@ mixin responsive-img(image, sizes = {})
     alt=image.alt || ''
     src=image.url || `/images/${image}`
     srcset=srcset(image)
-    sizes=`${getSizes(sizes)}`
+    sizes=getSizes(sizes)
     loading=imgLoading
   )
