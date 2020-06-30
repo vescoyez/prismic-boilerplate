@@ -1,70 +1,54 @@
 {
-  "name": "boilerplate",
+  "name": "Prismic-Boilerplate",
   "version": "1.0.0",
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "^7.9.5",
-    "@babel/register": "^7.9.0",
-    "acorn": "^7.1.1",
-    "autoprefixer": "^9.7.6",
-    "babel-loader": "^8.1.0",
-    "beeper": "^2.0.0",
-    "browser-sync": "^2.26.7",
-    "chalk": "^4.0.0",
-    "cssnano": "^4.1.10",
-    "del": "^5.1.0",
-    "dotenv": "^8.2.0",
-    "eslint": "^6.8.0",
-    "eslint-loader": "^4.0.0",
-    "glob": "^7.1.6",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-cache": "^1.1.3",
-    "gulp-changed": "^4.0.2",
-    "gulp-data": "^1.3.1",
-    "gulp-imagemin": "^7.1.0",
-    "gulp-plumber": "^1.2.1",
-    "gulp-postcss": "^8.0.0",
-    "gulp-pug": "^4.0.1",
-    "gulp-rename": "^2.0.0",
-    "gulp-responsive": "^3.0.1",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "merge-stream": "^2.0.0",
-    "prismic-dom": "^2.2.3",
-    "prismic-javascript": "^2.7.1",
-    "stimulus": "^1.1.1",
-    "tailwindcss": "^1.3.4",
-    "webpack": "^4.42.1",
-    "webpack-stream": "^5.2.1"
-  },
+  "description": "Get started with Prismic",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "gulp dev --require @babel/register --gulpfile gulp",
-    "build": "gulp build --require @babel/register --gulpfile gulp"
+    "dev": "webpack-dev-server --config config/webpack.config.js",
+    "open": "webpack-dev-server --config config/webpack.config.js --open",
+    "build": "NODE_ENV=production webpack --config config/webpack.config.js"
+  },
+  "author": "vescoyez",
+  "license": "ISC",
+  "dependencies": {
+    "stimulus": "^1.1.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/preset-env": "^7.10.3",
+    "autoprefixer": "^9.8.4",
+    "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^6.0.2",
+    "css-loader": "^3.6.0",
+    "dotenv": "^8.2.0",
+    "file-loader": "^6.0.0",
+    "glob": "^7.1.6",
+    "html-webpack-plugin": "^4.3.0",
+    "imagemin": "^7.0.1",
+    "img-loader": "^3.0.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "pluralize": "^8.0.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-nesting": "^7.0.1",
+    "prismic-dom": "^2.2.3",
+    "prismic-javascript": "^3.0.0",
+    "pug": "^3.0.0",
+    "pug-loader": "^2.4.0",
+    "responsive-loader": "^1.2.0",
+    "sharp": "^0.25.4",
+    "svg-inline-loader": "^0.8.2",
+    "tailwindcss": "^1.4.6",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
   },
   "engines": {
     "node": ">= 13.13.0"
   },
   "browserslist": [
-    "> 0.25%"
+    "> 0.5%"
   ],
-  "eslintConfig": {
-    "env": {
-      "es6": true,
-      "browser": true,
-      "node": true
-    },
-    "extends": "eslint:recommended",
-    "rules": {
-      "no-console": "warn"
-    },
-    "parserOptions": {
-      "ecmaVersion": 9,
-      "sourceType": "module"
-    }
-  },
   "babel": {
     "presets": [
       "@babel/preset-env"

@@ -1,6 +1,6 @@
 mixin icon(name)
   span&attributes(attributes)
-    != icon(name)
+    != require(`icons/${name}.svg`)
 
 mixin button(content)
   - const tag = attributes.href ? 'a' : 'button'
@@ -12,10 +12,23 @@ mixin card
     block
 
 mixin responsive-img(image, sizes = {})
+  - if ( !image.url ) image = require(`images/${image}`)
   img&attributes(attributes)(
+    src=image.url || image.src
     alt=image.alt || ''
-    src=image.url || `/images/${image}`
-    srcset=srcset(image)
+    srcset=getSrcset(image)
     sizes=getSizes(sizes)
+    width=image.width || image.dimensions.width
+    height=image.height || image.dimensions.height
+    loading=imgLoading
+  )
+
+mixin img(image)
+  - image = require(`images/${image}`)
+  img&attributes(attributes)(
+    src=image.src
+    alt=""
+    width=image.width
+    height=image.height
     loading=imgLoading
   )

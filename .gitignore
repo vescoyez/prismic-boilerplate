@@ -12,7 +12,6 @@
 
 # Cache
 # ----------------------------
-/.sass-cache
 /.cache
 
 # .DS_store files

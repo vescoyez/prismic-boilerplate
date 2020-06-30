@@ -1,32 +1,22 @@
-import { img } from './app.config'
-import fs from 'fs'
-import path from 'path'
-import { linkResolver } from '../gulp/_prismic'
-import PrismicDOM from 'prismic-dom'
-import { theme } from './tailwind.config'
-
-const resize = (image, width) => {
-  if ( image.url ) {
-    const url = new URL(image.url)
-    url.searchParams.set('w', image.dimensions.width < width ? image.dimensions.width : width)
-    url.searchParams.delete('h')
-    return url.href
-  } else {
-    const imagePath = path.parse(image)
-    return path.join('/images', imagePath.dir, '_size', width.toString(), imagePath.base)
-  }
-}
+const config = require('./app.config')
+const fs = require('fs')
+const path = require('path')
+const PrismicDOM = require('prismic-dom')
+const tailwind = require('./tailwind.config')
+const views = require('./webpack/views')
 
 module.exports = {
-  basedir: './src/views',
-  locals: {
+  globals: {
     iconList: fs.readdirSync('./src/icons').map(dir => path.parse(dir).name),
-    icon: name => fs.readFileSync(`./src/icons/${name}.svg`),
-    asHtml: text => PrismicDOM.RichText.asHtml(text, linkResolver),
-    url: page => linkResolver(page),
-    srcset: (image) => img.srcset.map(size => `${resize(image, size)} ${size}w`).join(','),
+    asHtml: text => PrismicDOM.RichText.asHtml(text, views.linkResolver),
+    getSrcset: (image) => image.srcSet || config.img.srcset.filter(width => image.dimensions.width >= width).map(width => {
+      const url = new URL(image.url)
+      url.searchParams.set('w', width)
+      url.searchParams.delete('h')
+      return `${url.href} ${width}w`
+    }).join(','),
     getSizes: (sizes) => {
-      const screenSizes = theme.screens
+      const screenSizes = tailwind.theme.screens
       const result = sizes.default ? [sizes.default] : []
       delete sizes.default
       for ( const breakpoint in sizes ) {
@@ -36,6 +26,6 @@ module.exports = {
       }
       return result.reverse().join(',')
     },
-    imgLoading: img.loading
+    imgLoading: config.img.loading,
   }
 }

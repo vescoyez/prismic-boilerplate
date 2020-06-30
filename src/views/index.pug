@@ -3,12 +3,15 @@ extends /_layouts/app.pug
 block content
   .container.mx-auto.px-4
     h1= page.title
-    != asHtml(page.text)
-    +responsive-img(page.cover, { default: '50vw', md: '25vw', lg: '320px' })
-    +responsive-img('landscape/landscape-2.jpg', { default: '50vw', md: '25vw', lg: '320px' })(alt="Valley")
+    h2= name
+    .text
+      != asHtml(page.text)
+    .grid.grid-cols-2.md_grid-cols-4
+      +responsive-img(page.cover, { default: '50vw', md: '25vw', xl: '320px' })
+      +responsive-img('landscapes/landscape-2.jpg', { default: '50vw', md: '25vw', xl: '320px' })(alt="Valley")
     ul
       each project in app.filter(page => page.type === 'project').slice(0, 3)
         li
           a(href=project.url)= project.title
     - projectsPage = getPage('projects')
-    +button(href=url(projectsPage))= projectsPage.title
+    +button(href=projectsPage.url)= projectsPage.title

@@ -1,21 +1,24 @@
 module.exports = {
-  dest: './dist',
+  favicon: './src/public/favicon.svg',
   img: {
-    srcset: [200, 500, 800, 1200, 1500]
+    loading: 'lazy',
+    srcset: [1500, 1200, 800, 500, 200],
   },
   languages: [
     {
       source: 'en-us',
       slug: 'en',
-      label: 'English'
+      label: 'English',
+      tag: 'en',
     },
     {
       source: 'fr-fr',
       slug: 'fr',
-      label: 'Français'
+      label: 'Français',
+      tag: 'fr',
     }
   ],
   pagination: {
-    itemPerPage: 24
+    itemsPerPage: 6
   }
 }
