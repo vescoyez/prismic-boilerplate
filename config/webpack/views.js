@@ -35,7 +35,8 @@ const createPages = (content) => {
         storeLink(lang, page)
         
         Array.from(Array(pageNumber), (_, i) => {
-          const suffix = i === 0 ? '' : `${i + 1}`
+          const currentPage = i + 1
+          const suffix = currentPage === 1 ? '' : `${currentPage}`
           
           templates.push({
             lang: lang,
@@ -46,8 +47,9 @@ const createPages = (content) => {
               page,
               items: items.slice((i * itemsPerPage), (i * itemsPerPage + itemsPerPage)),
               pagination: {
-                next: (i + 2) <= pageNumber ? path.join('/', lang.slug, viewPath.dir, `${i + 2}`) : null,
-                previous: i == 1 ? path.join('/', lang.slug, viewPath.dir) : i > 1 ? path.join('/', lang.slug, viewPath.dir, `${i}`) : null
+                current: currentPage,
+                previous: currentPage == 2 ? path.join('/', lang.slug, viewPath.dir) : currentPage > 2 ? path.join('/', lang.slug, viewPath.dir, `${currentPage - 1}`) : null,
+                next: (currentPage + 1) <= pageNumber ? path.join('/', lang.slug, viewPath.dir, `${currentPage + 1}`) : null,
               }
             },
           })
