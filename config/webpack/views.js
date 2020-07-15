@@ -3,7 +3,7 @@ const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 const pluralize = require('pluralize')
-const pug = require('../pug.config')
+const { locals } = require('../pug.config')
 
 const links = {}
 
@@ -42,7 +42,7 @@ const createPages = (content) => {
             lang: lang,
             dir: path.join(viewPath.dir, suffix),
             template: view,
-            globals: {
+            locals: {
               app,
               page,
               items: items.slice((i * itemsPerPage), (i * itemsPerPage + itemsPerPage)),
@@ -67,7 +67,7 @@ const createPages = (content) => {
             lang: lang,
             dir: path.join(viewPath.dir, page.uid),
             template: view,
-            globals: {
+            locals: {
               app,
               page,
             },
@@ -86,7 +86,7 @@ const createPages = (content) => {
           lang: lang,
           dir: viewPath.dir,
           template: view,
-          globals: {
+          locals: {
             app,
             page,
           },
@@ -100,9 +100,9 @@ const createPages = (content) => {
       filename: path.join(template.lang.slug, template.dir, 'index.html'),
       template: template.template,
       templateParameters: {
-        ...pug.globals,
-        ...template.globals,
-        getPage: uid => template.globals.app.find(page => page.uid === uid),
+        ...locals,
+        ...template.locals,
+        getPage: uid => template.locals.app.find(page => page.uid === uid),
         lang: template.lang,
       },
       favicon: config.favicon,

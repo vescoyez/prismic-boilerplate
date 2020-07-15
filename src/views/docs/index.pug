@@ -5,7 +5,16 @@ block content
     h1 Documentation
     button.bg-red-500.px-4.py-2.text-white.rounded-lg(type="button") This is a button
     +button(href="#") Hello
-    +card
-      span test
-    +icon('activity')
-    h2= var1
+    p Previews
+    +document('button', {
+      color: {
+        value: ['blue', 'red'],
+        default: 'blue'
+      },
+      size: {
+        value: ['sm', 'lg'],
+      },
+    }) This is a documented button
+    +preview
+      +icon('activity', 'test')(href="#")
+        p This is an icon

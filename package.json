@@ -26,6 +26,7 @@
     "file-loader": "^6.0.0",
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.3.0",
+    "html2pug": "^4.0.0",
     "imagemin": "^7.0.1",
     "img-loader": "^3.0.1",
     "mini-css-extract-plugin": "^0.9.0",

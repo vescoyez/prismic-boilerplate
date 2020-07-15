@@ -1,9 +1,9 @@
 mixin icon(name)
   span&attributes(attributes)
-    != require(`icons/${name}.svg`)
+    !=require(`icons/${name}.svg`)
 
 mixin button(content)
-  - const tag = attributes.href ? 'a' : 'button'
+  -const tag = attributes.href ? 'a' : 'button'
   #{tag}.bg-red-500.px-4.py-2.text-white.rounded-lg&attributes(attributes)
     block
 
@@ -12,7 +12,7 @@ mixin card
     block
 
 mixin responsive-img(image, sizes = {})
-  - if ( !image.url ) image = require(`images/${image}`)
+  -if ( !image.url ) image = require(`images/${image}`)
   img&attributes(attributes)(
     src=image.url || image.src
     alt=image.alt || ''
@@ -24,7 +24,7 @@ mixin responsive-img(image, sizes = {})
   )
 
 mixin img(image)
-  - image = require(`images/${image}`)
+  -image = require(`images/${image}`)
   img&attributes(attributes)(
     src=image.src
     alt=""
@@ -32,3 +32,49 @@ mixin img(image)
     height=image.height
     loading=imgLoading
   )
+    
+mixin preview
+  block
+  pre
+    =getPugCode(block)
+
+mixin doc-pug-code(docComponent, docParams, docAttr, docBlock)
+  =getPugCode(block, docComponent, docParams, docAttr, docBlock)
+
+mixin document(docComp, settings,  ...docParams)
+  -const defaultAttr = {...attributes}
+  each param, attr in settings
+    -if ( param.default ) defaultAttr[attr] = param.default
+  each param, attr in settings
+    h2=capitalize(attr)
+    table.my-6
+      tr
+        th.border.px-4.py-2 Name
+        th.border.px-4.py-2 Type
+        th.border.px-4.py-2 Default
+      tr
+        td.border.px-4.py-2
+          code=attr
+        td.border.px-4.py-2
+          code=[...new Set(param.value.map(val => Array.isArray(val) ? 'array' : typeof(val)))].join('|')
+        td.border.px-4.py-2
+          code=JSON.stringify(defaultAttr[attr]||null)
+    table.my-6
+      tr
+        th.border.px-4.py-2 Variations
+      each value in param.value
+        tr
+          td.border.px-4.py-2
+            code=JSON.stringify(value)
+    each value in param.value
+      -attributes[attr] = value
+      +#{docComp}(...docParams)&attributes(attributes)
+        block
+    pre
+      each value in param.value
+        -attributes[attr] = value
+        div
+          +doc-pug-code(docComp, docParams, attributes, block)
+            +#{docComp}(...docParams)&attributes(attributes)
+              block
+    -attributes = {...defaultAttr}
