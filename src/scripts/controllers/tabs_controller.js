@@ -8,7 +8,7 @@ export default class extends Controller {
     this.contentTargets.map((content, index) => position === index ? content.classList.remove('hidden') : content.classList.add('hidden'))
   }
 
-  connect() {
+  initialize() {
     this.activeClass = this.element.dataset.tabActiveClass
     this.selectTab(0)
   }
