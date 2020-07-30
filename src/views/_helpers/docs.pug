@@ -1,0 +1,70 @@
+mixin preview
+  block
+  pre
+    =getPugCode(block)
+
+mixin doc-pug-code(docComponent, docParams, docAttr, docBlock)
+  =getPugCode(block, docComponent, docParams, docAttr, docBlock)
+
+mixin document(docComp, settings,  ...docParams)
+  -const defaultAttr = {...attributes}
+  each param, attr in settings
+    -if ( param.required ) defaultAttr[attr] = param.required
+  -console.log(defaultAttr)
+  .prose.mt-6
+    h2 Attributes
+  each param, attr in settings
+    -attributes = {...defaultAttr}
+    .prose.mt-8
+      h3=capitalize(attr)
+      -if ( param.note )
+        p!=markdown(param.note)
+      table.table-fixed
+        thead
+          tr
+            th(class="w-1/4") Name
+            th(class="w-1/4") Type
+            th(class="w-1/4") Default
+            th(class="w-1/4") Required
+        tbody
+          tr
+            td
+              code=attr
+            td
+              code=[...new Set(param.value.filter(Boolean).map(val => Array.isArray(val) ? 'array' : typeof(val)))].join('|')
+            td
+              code=JSON.stringify(param.default) || 'null'
+            td
+              code=JSON.stringify(!!param.required)
+      table.table-fixed
+        thead
+          tr
+            th(class="w-1/4") Variations
+        tbody
+          tr
+            td
+              each value in param.value
+                code.mr-2=JSON.stringify(value)
+    .mt-4.mb-8
+      .border.rounded-t-md.p-4
+        each value in param.value
+          -attributes[attr] = value
+          +#{docComp}(...docParams)&attributes(attributes)
+            block
+      div(data-controller="tabs" data-tab-active-class="text-white")
+        nav.bg-black.px-4.py-2.text-gray-500
+          a.hover_text-gray-200.mr-4.transition.duration-200(href="#" data-target="tabs.tab" data-action="click->tabs#select") Pug
+          a.hover_text-gray-200.mr-4.transition.duration-200(href="#" data-target="tabs.tab" data-action="click->tabs#select") HTML
+        pre.bg-gray-900.text-white.rounded-b-md.overflow-auto.p-4(data-controller="highlight" data-target="tabs.content")
+          each value in param.value
+            -attributes[attr] = value
+            code.block(data-target="highlight.pug")
+              +doc-pug-code(docComp, docParams, attributes, block)
+                +#{docComp}(...docParams)&attributes(attributes)
+                  block
+        pre.bg-gray-900.text-white.rounded-b-md.overflow-auto.p-4.hidden(data-controller="highlight" data-target="tabs.content")
+          each value in param.value
+            -attributes[attr] = value
+            code.block(data-target="highlight.html")
+              +#{docComp}(...docParams)&attributes(attributes)
+                block
