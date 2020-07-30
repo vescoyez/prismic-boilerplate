@@ -1,14 +1,18 @@
 const config = require('./app.config')
 const fs = require('fs')
 const html2pug = require('html2pug')
+const markdownItPrism = require('markdown-it-prism')
+const markdownIt = require('markdown-it')().use(markdownItPrism)
 const path = require('path')
 const PrismicDOM = require('prismic-dom')
 const tailwind = require('./tailwind.config')
 const views = require('./webpack/views')
+require('prismjs/components/prism-javascript')
 
 const replaceDocParams = (block, docComp, docParams, docAttr, docBlock) => {
   if ( docComp ) block = block.replace(/docComp/g, JSON.stringify(docComp))
   if ( docParams ) block = block.replace(/, \.\.\.docParams/g, docParams.length ? ' ,' + docParams.map(param => JSON.stringify(param)).join(', ') : '')
+  if ( docAttr ) Object.keys(docAttr).forEach((key) => (docAttr[key] == null) && delete docAttr[key])
   if ( docAttr ) block = block.replace(/attributes: attributes/g, `attributes: ${JSON.stringify(docAttr)}`)
   block = block.replace(/block: function\(\){\nblock && block\(\);\n},/g, docBlock ? `block: ${docBlock.toString()},` : '')
   return block
@@ -83,6 +87,15 @@ module.exports = {
       }
       return result.reverse().join(',')
     },
+    attributesExcept: (attributes, keys) => {
+      const filterAttributes = { ...attributes }
+      keys.map(key => delete filterAttributes[key])
+      return filterAttributes
+    },
     imgLoading: config.img.loading,
-  }
+    markdown: (text) => markdownIt.render(text),
+  },
+  filters: {
+    markdown: (text) => `<div class="prose">${markdownIt.render(text)}</div>`,
+  },
 }

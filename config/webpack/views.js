@@ -1,9 +1,9 @@
 const config = require('../app.config')
+const { filters, locals } = require('../pug.config')
 const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 const pluralize = require('pluralize')
-const { locals } = require('../pug.config')
 
 const links = {}
 
@@ -21,6 +21,7 @@ const createPages = (content) => {
 
     for ( const view of views ) {
       const viewPath = path.parse(view.replace('src/views/', ''))
+      const isDocs = viewPath.dir.startsWith('docs')
 
       if ( viewPath.name === '_index' ) {
         const folder = viewPath.dir.split('/').pop()
@@ -73,17 +74,21 @@ const createPages = (content) => {
             },
           })
         }
-      } else {
+      } else if ( !isDocs || (isDocs && lang == config.languages[0]) ) {
         viewPath.dir = viewPath.name === 'index' ? viewPath.dir : path.join(viewPath.dir, viewPath.name)
         const folder = viewPath.dir.split('/').pop()
         const type = folder || 'home'
         const page = app.find(page => page.type === type) || { lang: lang.source, uid: folder }
+        const pageLang = {
+          ...lang,
+          slug: isDocs ? '' : lang.slug
+        }
 
-        page.url = path.join('/', lang.slug, viewPath.dir)
-        storeLink(lang, page)
+        page.url = path.join('/', pageLang.slug, viewPath.dir)
+        storeLink(pageLang, page)
 
         templates.push({
-          lang: lang,
+          lang: pageLang,
           dir: viewPath.dir,
           template: view,
           locals: {
@@ -123,6 +128,7 @@ exports.rules = [
         loader: 'pug-loader',
         options: {
           root: path.resolve(__dirname, '../../src/views'),
+          filters,
         },
       },
     ],

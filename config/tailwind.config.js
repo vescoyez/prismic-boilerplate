@@ -4,16 +4,11 @@ module.exports = {
     content: [
       './src/views/**/*.pug',
       './src/scripts/**/*.js',
+      './config/pug.config.js.js',
     ],
   },
   separator: '_',
   theme: {
-    screens: {
-      sm: '640px',
-      md: '768px',
-      lg: '1024px',
-      xl: '1280px',
-    },
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
@@ -43,5 +38,37 @@ module.exports = {
         500: '#2C7BE5',
       },
     },
+    screens: {
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+    },
+    typography: (theme) => ({
+      default: {
+        css: {
+          color: theme('colors.gray.800'),
+          h1: {
+            fontWeight: '700',
+          },
+          code: {
+            background: theme('colors.gray.100'),
+            padding: '0.3em 0.4em',
+            borderRadius: '0.5em',
+            fontWeight: '400',
+            color: theme('colors.blue.500'),
+          },
+          'code::before': {
+            content: '',
+          },
+          'code::after': {
+            content: '',
+          },
+        }
+      }
+    }),
   },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

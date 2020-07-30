@@ -1,20 +1,25 @@
 extends /_layouts/docs.pug
 
 block content
-  .container.mx-auto.px-4
-    h1 Documentation
-    button.bg-red-500.px-4.py-2.text-white.rounded-lg(type="button") This is a button
-    +button(href="#") Hello
-    p Previews
+  .container.mx-auto.my-8.px-4
+    :markdown
+      # Button
+      Use custom button styles for actions in forms, dialogs, and more with support for multiple sizes, states, and more.
     +document('button', {
+      href: {
+        value: ['#', null],
+        note: 'Add an `href` attributes to turn a `button` into an `a`.',
+      },
       color: {
         value: ['blue', 'red'],
-        default: 'blue'
+        required: 'blue',
       },
       size: {
-        value: ['sm', 'lg'],
+        value: ['sm', 'md'],
+        default: 'md',
       },
-    }) This is a documented button
-    +preview
-      +icon('activity', 'test')(href="#")
-        p This is an icon
+      disabled: {
+        value: [true, false],
+        default: false,
+      },
+    }) Button
