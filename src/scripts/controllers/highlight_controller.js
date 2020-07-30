@@ -6,7 +6,7 @@ import 'prismjs/components/prism-pug'
 export default class extends Controller {
   static targets = ['html', 'pug']
 
-  connect() {
+  initialize() {
     for ( const html of this.htmlTargets ) {
       const prettyHtml = beautify.html(html.innerHTML)
       const highlightedHtml = Prism.highlight(prettyHtml, Prism.languages.html, 'html')
