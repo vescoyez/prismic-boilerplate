@@ -10,7 +10,6 @@ mixin document(docComp, settings,  ...docParams)
   -const defaultAttr = {...attributes}
   each param, attr in settings
     -if ( param.required ) defaultAttr[attr] = param.required
-  -console.log(defaultAttr)
   .prose.mt-6
     h2 Attributes
   each param, attr in settings
