@@ -20,5 +20,5 @@ module.exports = {
   ],
   pagination: {
     itemsPerPage: 6
-  }
+  },
 }

@@ -30,5 +30,8 @@ module.exports = () => {
         icons: path.resolve(__dirname, '../src/icons/'),
       },
     },
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+    },
   }))
 }
