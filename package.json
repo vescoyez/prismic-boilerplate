@@ -43,7 +43,7 @@
     "pug": "^3.0.0",
     "pug-loader": "^2.4.0",
     "responsive-loader": "^1.2.0",
-    "sharp": "^0.25.4",
+    "sharp": "^0.30.5",
     "svg-inline-loader": "^0.8.2",
     "tailwindcss": "^1.4.6",
     "webpack": "^4.43.0",
